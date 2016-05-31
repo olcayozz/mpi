@@ -1,0 +1,63 @@
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void broadCast(int proc);
+
+int decimal_binary(int n)  /* Function to convert decimal to binary.*/
+{
+    int rem, i=1, binary=0;
+    while (n!=0)
+    {
+        rem=n%2;
+        n/=2;
+        binary+=rem*i;
+        i*=10;
+    }
+    return binary;
+}
+
+int binary_decimal(int n) /* Function to convert binary to decimal.*/
+{
+    int decimal=0, i=0, rem;
+    while (n!=0)
+    {
+        rem = n%10;
+        n/=10;
+        decimal += rem*pow(2,i);
+        ++i;
+    }
+    return decimal;
+}
+
+int world_rank;
+int val=-1;
+
+int main(int argc, char** argv) {
+  MPI_Init(NULL, NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  int world_size;
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+  if(world_rank==0)
+  {
+    val=9;
+  }
+
+
+if(val!=-1)
+  broadCast(val);
+
+  MPI_Finalize();
+}
+
+void broadCast(int proc){
+  int sender = decimal_binary(world_rank);
+  int h1=sender+1;
+  int h2=sender+2;
+  int h3=sender+4;
+  int h4=sender+8;
+
+  printf("[%d] ; val = [%d] \n\n",world_rank,decimal_binary(val));
+}

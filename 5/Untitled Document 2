@@ -1,0 +1,64 @@
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void broadCast(int proc);
+int world_rank;
+int val=-1;
+
+int main(int argc, char** argv) {
+  MPI_Init(NULL, NULL);
+	
+  
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  int world_size;
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+  if(world_rank==0)
+  {
+    val=9;
+  }
+
+  int iterator = 0;
+
+do{
+  int startPoint = iterator*world_rank;
+  int birinciKose=startPoint+1;
+  int ikinciKose = startPoint+2;
+  int ucuncuKose = startPoint+4;
+  int dorduncuKose = startPoint+8;
+
+
+	if(startPoint==world_rank){
+	  MPI_Send(&val, 1, MPI_INT, birinciKose, 0, MPI_COMM_WORLD);
+	  MPI_Send(&val, 1, MPI_INT, ikinciKose, 0, MPI_COMM_WORLD);
+	  MPI_Send(&val, 1, MPI_INT, ucuncuKose, 0, MPI_COMM_WORLD);
+	  MPI_Send(&val, 1, MPI_INT, dorduncuKose, 0, MPI_COMM_WORLD);
+	}
+	if(	world_rank==birinciKose ||
+		world_rank==ikinciKose ||
+		world_rank==ucuncuKose ||
+		world_rank==dorduncuKose
+		)
+	{
+	   MPI_Recv(&val, 1, MPI_INT, startPoint, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	   //printf("[%d] --> [%d] ; val = [%d] \n\n",iterator,world_rank,val);
+	}    
+
+  iterator++;
+}while(iterator<1);
+
+if(val!=-1)
+  broadCast(val);
+
+  MPI_Finalize();
+}
+
+void broadCast(int proc){
+  int sender = world_rank;
+  int p1 = if(sender%2>0) 1 else -1;
+  int p21 = if(sender%2>0) 1 else -1;
+
+  printf("[%d] ; val = [%d] \n\n",world_rank,val);
+}
